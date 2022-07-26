@@ -4,6 +4,8 @@ const math = std.math;
 const Allocator = mem.Allocator;
 const assert = std.debug.assert;
 
+/// Double-ended queue ported from Rust's standard library, which is provided under MIT License.
+/// It can be found at https://github.com/rust-lang/rust/blob/master/LICENSE-MIT
 pub fn Deque(comptime T: type) type {
     return struct {
         /// tail and head are pointers into the buffer. Tail always points
