@@ -30,9 +30,9 @@ pub fn Deque(comptime T: type) type {
 
         /// Creates an empty deque with space for at least `capacity` elements.
         pub fn initCapacity(allocator: Allocator, capacity: usize) !Self {
-            const effective_cap = try math.ceilPowerOfTwo(math.max(capacity + 1, MINIMUM_CAPACITY + 1));
+            const effective_cap = try math.ceilPowerOfTwo(usize, math.max(capacity + 1, MINIMUM_CAPACITY + 1));
             const buf = try allocator.alloc(T, effective_cap);
-            return .{
+            return Self{
                 .tail = 0,
                 .head = 0,
                 .buf = buf,
