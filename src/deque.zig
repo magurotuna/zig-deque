@@ -66,7 +66,7 @@ pub fn Deque(comptime T: type) type {
 
             const head = self.head;
             self.head = self.wrapAdd(self.head, 1);
-            self.but[head] = item;
+            self.buf[head] = item;
         }
 
         pub fn pushFront(self: *Self, item: T) !void {
@@ -109,7 +109,11 @@ pub fn Deque(comptime T: type) type {
             const old_cap = self.cap();
 
             // Reserve additional space to accomodate more items
-            try self.buf.ensureUnusedCapacity(old_cap);
+            var new_buf = try self.allocator.alloc(T, old_cap * 2);
+            mem.copy(T, new_buf, self.buf);
+            self.allocator.free(self.buf);
+            self.buf = new_buf;
+
             // Update `tail` and `head` pointers accordingly
             self.handleCapacityIncrease(old_cap);
 
@@ -176,7 +180,7 @@ pub fn Deque(comptime T: type) type {
         fn copyNonOverlapping(self: *Self, dest: usize, src: usize, length: usize) void {
             assert(dest + length <= self.cap());
             assert(src + length <= self.cap());
-            mem.copy(T, self.buf.items[dest .. dest + length], self.buf.items[src .. src + length]);
+            mem.copy(T, self.buf[dest .. dest + length], self.buf[src .. src + length]);
         }
 
         fn wrapAdd(self: Self, idx: usize, addend: usize) usize {
