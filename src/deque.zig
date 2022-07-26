@@ -202,3 +202,43 @@ fn wrapIndex(index: usize, size: usize) usize {
     assert(math.isPowerOfTwo(size));
     return index & (size - 1);
 }
+
+test "Deque works" {
+    const testing = std.testing;
+
+    var deque = try Deque(usize).init(testing.allocator);
+    defer deque.deinit();
+
+    // empty deque
+    try testing.expectEqual(@as(usize, 0), deque.len());
+    try testing.expect(deque.get(0) == null);
+    try testing.expect(deque.popBack() == null);
+    try testing.expect(deque.popFront() == null);
+
+    // pushBack
+    try deque.pushBack(1);
+    try testing.expectEqual(@as(usize, 1), deque.len());
+    try testing.expectEqual(@as(usize, 1), deque.get(0).?);
+
+    // pushFront
+    try deque.pushFront(0);
+    try testing.expectEqual(@as(usize, 2), deque.len());
+    try testing.expectEqual(@as(usize, 0), deque.get(0).?);
+    try testing.expectEqual(@as(usize, 1), deque.get(1).?);
+
+    // more items
+    {
+        var i: usize = 2;
+        while (i < 42) : (i += 1) {
+            try deque.pushBack(i);
+        }
+    }
+
+    try testing.expectEqual(@as(usize, 42), deque.len());
+    {
+        var i: usize = 0;
+        while (i < deque.len()) : (i += 1) {
+            try testing.expectEqual(i, deque.get(i).?);
+        }
+    }
+}
