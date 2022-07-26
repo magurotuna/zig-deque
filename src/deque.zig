@@ -6,6 +6,11 @@ const assert = std.debug.assert;
 
 pub fn Deque(comptime T: type) type {
     return struct {
+        /// tail and head are pointers into the buffer. Tail always points
+        /// to the first element that could be read, Head always points
+        /// to where data should be written.
+        /// If tail == head the buffer is empty. The length of the ringbuffer
+        /// is defined as the distance between the two.
         tail: usize,
         head: usize,
         /// Users should **NOT** use this field directly.
@@ -54,29 +59,45 @@ pub fn Deque(comptime T: type) type {
             return self.buf[idx];
         }
 
-        // pub fn pushBack(self: *Self, item: T) !void {
-        //     if (self.isFull()) {
-        //         try self.grow();
-        //     }
+        pub fn pushBack(self: *Self, item: T) !void {
+            if (self.isFull()) {
+                try self.grow();
+            }
 
-        //     const head = self.head;
-        //     self.head = self.wrapAdd(self.head, 1);
-        //     self.bufWrite(head, item);
-        // }
+            const head = self.head;
+            self.head = self.wrapAdd(self.head, 1);
+            self.but[head] = item;
+        }
 
-        // pub fn pushFront(self: *Self, item: T) !void {
-        //     // TODO
-        // }
+        pub fn pushFront(self: *Self, item: T) !void {
+            if (self.isFull()) {
+                try self.grow();
+            }
 
-        // pub fn popBack(self: *Self) ?T {
-        //     // TODO
-        //     return null;
-        // }
+            self.tail = self.wrapSub(self.tail, 1);
+            const tail = self.tail;
+            self.buf[tail] = item;
+        }
 
-        // pub fn popFront(self: *Self) ?T {
-        //     // TODO
-        //     return null;
-        // }
+        pub fn popBack(self: *Self) ?T {
+            if (self.len() == 0) return null;
+
+            self.head = self.wrapSub(self.head, 1);
+            const head = self.head;
+            const item = self.buf[head];
+            self.buf[head] = undefined;
+            return item;
+        }
+
+        pub fn popFront(self: *Self) ?T {
+            if (self.len() == 0) return null;
+
+            const tail = self.tail;
+            self.tail = self.wrapAdd(self.tail, 1);
+            const item = self.buf[tail];
+            self.buf[tail] = undefined;
+            return item;
+        }
 
         /// Returns `true` if the buffer is at full capacity.
         fn isFull(self: Self) bool {
