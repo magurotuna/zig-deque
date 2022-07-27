@@ -10,7 +10,7 @@ const std = @import("std");
 var deque = try Deque(usize).init(std.heap.page_allocator);
 defer deque.deinit();
 
-// You can efficiently push items both to both ends
+// You can efficiently push items to both ends
 try deque.pushBack(1);
 try deque.pushBack(2);
 try deque.pushFront(0);
@@ -27,4 +27,4 @@ std.debug.assert(deque.popBack().? == @as(usize, 2));
 
 ## Version
 
-Tested under both v0.9.1 and 0.10.0-dev.3007+6ba2fb3db
+Tested under both v0.9.1 and v0.10.0-dev.3007+6ba2fb3db
