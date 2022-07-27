@@ -17,7 +17,7 @@ pub fn Deque(comptime T: type) type {
         head: usize,
         /// Users should **NOT** use this field directly.
         /// In order to access an item with an index, use `get` method.
-        /// If you want to iterate over the items, call `iterate` method to get the iterator.
+        /// If you want to iterate over the items, call `iterator` method to get an iterator.
         buf: []T,
         allocator: Allocator,
 
@@ -100,6 +100,30 @@ pub fn Deque(comptime T: type) type {
             self.buf[tail] = undefined;
             return item;
         }
+
+        /// Returns an iterator over the deque.
+        /// Modifying the deque may invalidate this iterator.
+        pub fn iterator(self: Self) Iterator {
+            return .{
+                .head = self.head,
+                .tail = self.tail,
+                .ring = self.buf,
+            };
+        }
+
+        pub const Iterator = struct {
+            head: usize,
+            tail: usize,
+            ring: []T,
+
+            pub fn next(it: *Iterator) ?T {
+                if (it.head == it.tail) return null;
+
+                const tail = it.tail;
+                it.tail = wrapIndex(it.tail +% 1, it.ring.len);
+                return it.ring[tail];
+            }
+        };
 
         /// Returns `true` if the buffer is at full capacity.
         fn isFull(self: Self) bool {
@@ -241,6 +265,13 @@ test "Deque works" {
         var i: usize = 0;
         while (i < deque.len()) : (i += 1) {
             try testing.expectEqual(i, deque.get(i).?);
+        }
+    }
+    {
+        var i: usize = 0;
+        var it = deque.iterator();
+        while (it.next()) |val| : (i += 1) {
+            try testing.expectEqual(i, val);
         }
     }
 }
