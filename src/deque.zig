@@ -242,25 +242,32 @@ test "Deque works" {
     try testing.expect(deque.popFront() == null);
 
     // pushBack
-    try deque.pushBack(1);
+    try deque.pushBack(101);
     try testing.expectEqual(@as(usize, 1), deque.len());
-    try testing.expectEqual(@as(usize, 1), deque.get(0).?);
+    try testing.expectEqual(@as(usize, 101), deque.get(0).?);
 
     // pushFront
-    try deque.pushFront(0);
+    try deque.pushFront(100);
     try testing.expectEqual(@as(usize, 2), deque.len());
-    try testing.expectEqual(@as(usize, 0), deque.get(0).?);
-    try testing.expectEqual(@as(usize, 1), deque.get(1).?);
+    try testing.expectEqual(@as(usize, 100), deque.get(0).?);
+    try testing.expectEqual(@as(usize, 101), deque.get(1).?);
 
     // more items
     {
-        var i: usize = 2;
-        while (i < 42) : (i += 1) {
+        var i: usize = 99;
+        while (true) : (i -= 1) {
+            try deque.pushFront(i);
+            if (i == 0) break;
+        }
+    }
+    {
+        var i: usize = 102;
+        while (i < 200) : (i += 1) {
             try deque.pushBack(i);
         }
     }
 
-    try testing.expectEqual(@as(usize, 42), deque.len());
+    try testing.expectEqual(@as(usize, 200), deque.len());
     {
         var i: usize = 0;
         while (i < deque.len()) : (i += 1) {
@@ -273,5 +280,6 @@ test "Deque works" {
         while (it.next()) |val| : (i += 1) {
             try testing.expectEqual(i, val);
         }
+        try testing.expectEqual(@as(usize, 200), i);
     }
 }
