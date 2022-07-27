@@ -135,10 +135,7 @@ pub fn Deque(comptime T: type) type {
             const old_cap = self.cap();
 
             // Reserve additional space to accomodate more items
-            var new_buf = try self.allocator.alloc(T, old_cap * 2);
-            mem.copy(T, new_buf, self.buf);
-            self.allocator.free(self.buf);
-            self.buf = new_buf;
+            self.buf = try self.allocator.realloc(self.buf, old_cap * 2);
 
             // Update `tail` and `head` pointers accordingly
             self.handleCapacityIncrease(old_cap);
