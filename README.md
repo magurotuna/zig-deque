@@ -16,9 +16,9 @@ try deque.pushBack(2);
 try deque.pushFront(0);
 
 // Possible to random-access via `get` method
-std.debug.assert(deque.get(0).? == @as(usize, 0));
-std.debug.assert(deque.get(1).? == @as(usize, 1));
-std.debug.assert(deque.get(2).? == @as(usize, 2));
+std.debug.assert(deque.get(0).?.* == @as(usize, 0));
+std.debug.assert(deque.get(1).?.* == @as(usize, 1));
+std.debug.assert(deque.get(2).?.* == @as(usize, 2));
 std.debug.assert(deque.get(3) == null);
 
 // An iterator is provided

@@ -54,11 +54,11 @@ pub fn Deque(comptime T: type) type {
             return count(self.tail, self.head, self.cap());
         }
 
-        pub fn get(self: Self, index: usize) ?T {
+        pub fn get(self: Self, index: usize) ?*T {
             if (index >= self.len()) return null;
 
             const idx = self.wrapAdd(self.tail, index);
-            return self.buf[idx];
+            return &self.buf[idx];
         }
 
         pub fn pushBack(self: *Self, item: T) !void {
@@ -241,13 +241,13 @@ test "Deque works" {
     // pushBack
     try deque.pushBack(101);
     try testing.expectEqual(@as(usize, 1), deque.len());
-    try testing.expectEqual(@as(usize, 101), deque.get(0).?);
+    try testing.expectEqual(@as(usize, 101), deque.get(0).?.*);
 
     // pushFront
     try deque.pushFront(100);
     try testing.expectEqual(@as(usize, 2), deque.len());
-    try testing.expectEqual(@as(usize, 100), deque.get(0).?);
-    try testing.expectEqual(@as(usize, 101), deque.get(1).?);
+    try testing.expectEqual(@as(usize, 100), deque.get(0).?.*);
+    try testing.expectEqual(@as(usize, 101), deque.get(1).?.*);
 
     // more items
     {
@@ -268,7 +268,7 @@ test "Deque works" {
     {
         var i: usize = 0;
         while (i < deque.len()) : (i += 1) {
-            try testing.expectEqual(i, deque.get(i).?);
+            try testing.expectEqual(i, deque.get(i).?.*);
         }
     }
     {
@@ -289,9 +289,9 @@ test "code sample in README" {
     try deque.pushBack(2);
     try deque.pushFront(0);
 
-    std.debug.assert(deque.get(0).? == @as(usize, 0));
-    std.debug.assert(deque.get(1).? == @as(usize, 1));
-    std.debug.assert(deque.get(2).? == @as(usize, 2));
+    std.debug.assert(deque.get(0).?.* == @as(usize, 0));
+    std.debug.assert(deque.get(1).?.* == @as(usize, 1));
+    std.debug.assert(deque.get(2).?.* == @as(usize, 2));
     std.debug.assert(deque.get(3) == null);
 
     var it = deque.iterator();
