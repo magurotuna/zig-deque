@@ -101,6 +101,24 @@ pub fn Deque(comptime T: type) type {
             return item;
         }
 
+        pub fn appendSlice(self: *Self, items: []const T) !void {
+            for (items) |item| {
+                try self.pushBack(item);
+            }
+        }
+
+        pub fn prependSlice(self: *Self, items: []const T) !void {
+            if (items.len == 0) return;
+
+            var i: usize = items.len - 1;
+
+            while (true) : (i -= 1) {
+                const item = items[i];
+                try self.pushFront(item);
+                if (i == 0) break;
+            }
+        }
+
         /// Returns an iterator over the deque.
         /// Modifying the deque may invalidate this iterator.
         pub fn iterator(self: Self) Iterator {
@@ -278,6 +296,25 @@ test "Deque works" {
             try testing.expectEqual(i, val.*);
         }
         try testing.expectEqual(@as(usize, 200), i);
+    }
+}
+
+test "appendSlice and prependSlice" {
+    const testing = std.testing;
+
+    var deque = try Deque(usize).init(testing.allocator);
+    defer deque.deinit();
+
+    try deque.prependSlice(&[_]usize{1, 2, 3, 4, 5, 6});
+    try deque.appendSlice(&[_]usize{7, 8, 9});
+    try deque.prependSlice(&[_]usize{0});
+    try deque.appendSlice(&[_]usize{10, 11, 12, 13, 14});
+
+    {
+        var i: usize = 0;
+        while (i <= 14) : (i += 1) {
+            try testing.expectEqual(i, deque.get(i).?.*);
+        }
     }
 }
 
