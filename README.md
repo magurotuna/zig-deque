@@ -25,7 +25,7 @@ std.debug.assert(deque.get(3) == null);
 var it = deque.iterator();
 var sum: usize = 0;
 while (it.next()) |val| {
-    sum += val;
+    sum += val.*;
 }
 std.debug.assert(sum == 3);
 
