@@ -116,12 +116,12 @@ pub fn Deque(comptime T: type) type {
             tail: usize,
             ring: []T,
 
-            pub fn next(it: *Iterator) ?T {
+            pub fn next(it: *Iterator) ?*T {
                 if (it.head == it.tail) return null;
 
                 const tail = it.tail;
                 it.tail = wrapIndex(it.tail +% 1, it.ring.len);
-                return it.ring[tail];
+                return &it.ring[tail];
             }
         };
 
@@ -275,7 +275,7 @@ test "Deque works" {
         var i: usize = 0;
         var it = deque.iterator();
         while (it.next()) |val| : (i += 1) {
-            try testing.expectEqual(i, val);
+            try testing.expectEqual(i, val.*);
         }
         try testing.expectEqual(@as(usize, 200), i);
     }
@@ -297,7 +297,7 @@ test "code sample in README" {
     var it = deque.iterator();
     var sum: usize = 0;
     while (it.next()) |val| {
-        sum += val;
+        sum += val.*;
     }
     std.debug.assert(sum == 3);
 
