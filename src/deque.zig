@@ -141,6 +141,13 @@ pub fn Deque(comptime T: type) type {
                 it.tail = wrapIndex(it.tail +% 1, it.ring.len);
                 return &it.ring[tail];
             }
+
+            pub fn nextBack(it: *Iterator) ?*T {
+                if (it.head == it.tail) return null;
+
+                it.head = wrapIndex(it.head -% 1, it.ring.len);
+                return &it.ring[it.head];
+            }
         };
 
         /// Returns `true` if the buffer is at full capacity.
@@ -314,6 +321,23 @@ test "appendSlice and prependSlice" {
         var i: usize = 0;
         while (i <= 14) : (i += 1) {
             try testing.expectEqual(i, deque.get(i).?.*);
+        }
+    }
+}
+
+test "nextBack" {
+    const testing = std.testing;
+
+    var deque = try Deque(usize).init(testing.allocator);
+    defer deque.deinit();
+
+    try deque.appendSlice(&[_]usize{5, 4, 3, 2, 1, 0});
+
+    {
+        var i: usize = 0;
+        var it = deque.iterator();
+        while (it.nextBack()) |val| : (i += 1) {
+            try testing.expectEqual(i, val.*);
         }
     }
 }
