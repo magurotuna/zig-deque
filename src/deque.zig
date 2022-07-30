@@ -312,10 +312,10 @@ test "appendSlice and prependSlice" {
     var deque = try Deque(usize).init(testing.allocator);
     defer deque.deinit();
 
-    try deque.prependSlice(&[_]usize{1, 2, 3, 4, 5, 6});
-    try deque.appendSlice(&[_]usize{7, 8, 9});
+    try deque.prependSlice(&[_]usize{ 1, 2, 3, 4, 5, 6 });
+    try deque.appendSlice(&[_]usize{ 7, 8, 9 });
     try deque.prependSlice(&[_]usize{0});
-    try deque.appendSlice(&[_]usize{10, 11, 12, 13, 14});
+    try deque.appendSlice(&[_]usize{ 10, 11, 12, 13, 14 });
 
     {
         var i: usize = 0;
@@ -331,7 +331,7 @@ test "nextBack" {
     var deque = try Deque(usize).init(testing.allocator);
     defer deque.deinit();
 
-    try deque.appendSlice(&[_]usize{5, 4, 3, 2, 1, 0});
+    try deque.appendSlice(&[_]usize{ 5, 4, 3, 2, 1, 0 });
 
     {
         var i: usize = 0;
