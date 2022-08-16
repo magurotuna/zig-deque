@@ -26,11 +26,13 @@ pub fn Deque(comptime T: type) type {
         const MINIMUM_CAPACITY = 1; // 2 - 1
 
         /// Creates an empty deque.
+        /// Deinitialize with `deinit`.
         pub fn init(allocator: Allocator) !Self {
             return initCapacity(allocator, INITIAL_CAPACITY);
         }
 
         /// Creates an empty deque with space for at least `capacity` elements.
+        /// Deinitialize with `deinit`.
         pub fn initCapacity(allocator: Allocator, capacity: usize) !Self {
             const effective_cap = try math.ceilPowerOfTwo(usize, math.max(capacity + 1, MINIMUM_CAPACITY + 1));
             const buf = try allocator.alloc(T, effective_cap);
@@ -42,18 +44,23 @@ pub fn Deque(comptime T: type) type {
             };
         }
 
+        /// Release all allocated memory.
         pub fn deinit(self: Self) void {
             self.allocator.free(self.buf);
         }
 
+        /// Returns the length of the already-allocated buffer.
         pub fn cap(self: Self) usize {
             return self.buf.len;
         }
 
+        /// Returns the number of elements in the deque.
         pub fn len(self: Self) usize {
             return count(self.tail, self.head, self.cap());
         }
 
+        /// Gets the pointer to the element with the given index, if any.
+        /// Otherwise it returns `null`.
         pub fn get(self: Self, index: usize) ?*T {
             if (index >= self.len()) return null;
 
@@ -61,6 +68,7 @@ pub fn Deque(comptime T: type) type {
             return &self.buf[idx];
         }
 
+        /// Adds the given element to the back of the deque.
         pub fn pushBack(self: *Self, item: T) !void {
             if (self.isFull()) {
                 try self.grow();
@@ -71,6 +79,7 @@ pub fn Deque(comptime T: type) type {
             self.buf[head] = item;
         }
 
+        /// Adds the given element to the front of the deque.
         pub fn pushFront(self: *Self, item: T) !void {
             if (self.isFull()) {
                 try self.grow();
@@ -81,6 +90,7 @@ pub fn Deque(comptime T: type) type {
             self.buf[tail] = item;
         }
 
+        /// Pops and returns the last element of the deque.
         pub fn popBack(self: *Self) ?T {
             if (self.len() == 0) return null;
 
@@ -91,6 +101,7 @@ pub fn Deque(comptime T: type) type {
             return item;
         }
 
+        /// Pops and returns the first element of the deque.
         pub fn popFront(self: *Self) ?T {
             if (self.len() == 0) return null;
 
@@ -101,12 +112,14 @@ pub fn Deque(comptime T: type) type {
             return item;
         }
 
+        /// Adds all the elements in the given slice to the back of the deque.
         pub fn appendSlice(self: *Self, items: []const T) !void {
             for (items) |item| {
                 try self.pushBack(item);
             }
         }
 
+        /// Adds all the elements in the given slice to the front of the deque.
         pub fn prependSlice(self: *Self, items: []const T) !void {
             if (items.len == 0) return;
 
