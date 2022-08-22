@@ -36,4 +36,4 @@ std.debug.assert(deque.popBack().? == @as(usize, 2));
 
 ## Version
 
-Tested under both v0.9.1 and v0.10.0-dev.3007+6ba2fb3db
+Tested under both v0.9.1 and v0.10.0-dev.3659+e5e6eb983
