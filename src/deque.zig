@@ -25,15 +25,19 @@ pub fn Deque(comptime T: type) type {
         const INITIAL_CAPACITY = 7; // 2^3 - 1
         const MINIMUM_CAPACITY = 1; // 2 - 1
 
+        pub const Error = error{
+            Overflow,
+        } || Allocator.Error;
+
         /// Creates an empty deque.
         /// Deinitialize with `deinit`.
-        pub fn init(allocator: Allocator) !Self {
+        pub fn init(allocator: Allocator) Error!Self {
             return initCapacity(allocator, INITIAL_CAPACITY);
         }
 
         /// Creates an empty deque with space for at least `capacity` elements.
         /// Deinitialize with `deinit`.
-        pub fn initCapacity(allocator: Allocator, capacity: usize) !Self {
+        pub fn initCapacity(allocator: Allocator, capacity: usize) Error!Self {
             const effective_cap = try math.ceilPowerOfTwo(usize, math.max(capacity + 1, MINIMUM_CAPACITY + 1));
             const buf = try allocator.alloc(T, effective_cap);
             return Self{
@@ -69,7 +73,7 @@ pub fn Deque(comptime T: type) type {
         }
 
         /// Adds the given element to the back of the deque.
-        pub fn pushBack(self: *Self, item: T) !void {
+        pub fn pushBack(self: *Self, item: T) Allocator.Error!void {
             if (self.isFull()) {
                 try self.grow();
             }
@@ -80,7 +84,7 @@ pub fn Deque(comptime T: type) type {
         }
 
         /// Adds the given element to the front of the deque.
-        pub fn pushFront(self: *Self, item: T) !void {
+        pub fn pushFront(self: *Self, item: T) Allocator.Error!void {
             if (self.isFull()) {
                 try self.grow();
             }
@@ -113,14 +117,14 @@ pub fn Deque(comptime T: type) type {
         }
 
         /// Adds all the elements in the given slice to the back of the deque.
-        pub fn appendSlice(self: *Self, items: []const T) !void {
+        pub fn appendSlice(self: *Self, items: []const T) Allocator.Error!void {
             for (items) |item| {
                 try self.pushBack(item);
             }
         }
 
         /// Adds all the elements in the given slice to the front of the deque.
-        pub fn prependSlice(self: *Self, items: []const T) !void {
+        pub fn prependSlice(self: *Self, items: []const T) Allocator.Error!void {
             if (items.len == 0) return;
 
             var i: usize = items.len - 1;
@@ -168,7 +172,7 @@ pub fn Deque(comptime T: type) type {
             return self.cap() - self.len() == 1;
         }
 
-        fn grow(self: *Self) !void {
+        fn grow(self: *Self) Allocator.Error!void {
             assert(self.isFull());
             const old_cap = self.cap();
 
