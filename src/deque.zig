@@ -75,6 +75,17 @@ pub fn Deque(comptime T: type) type {
             return &self.buf[idx];
         }
 
+        /// Gets the pointer to the first element, if any.
+        pub fn front(self: Self) ?*T {
+            return self.get(0);
+        }
+
+        /// Gets the pointer to the last element, if any.
+        pub fn back(self: Self) ?*T {
+            const last_idx = math.sub(usize, self.len(), 1) catch return null;
+            return self.get(last_idx);
+        }
+
         /// Adds the given element to the back of the deque.
         pub fn pushBack(self: *Self, item: T) Allocator.Error!void {
             if (self.isFull()) {
@@ -280,6 +291,8 @@ test "Deque works" {
     // empty deque
     try testing.expectEqual(@as(usize, 0), deque.len());
     try testing.expect(deque.get(0) == null);
+    try testing.expect(deque.front() == null);
+    try testing.expect(deque.back() == null);
     try testing.expect(deque.popBack() == null);
     try testing.expect(deque.popFront() == null);
 
@@ -287,12 +300,16 @@ test "Deque works" {
     try deque.pushBack(101);
     try testing.expectEqual(@as(usize, 1), deque.len());
     try testing.expectEqual(@as(usize, 101), deque.get(0).?.*);
+    try testing.expectEqual(@as(usize, 101), deque.front().?.*);
+    try testing.expectEqual(@as(usize, 101), deque.back().?.*);
 
     // pushFront
     try deque.pushFront(100);
     try testing.expectEqual(@as(usize, 2), deque.len());
     try testing.expectEqual(@as(usize, 100), deque.get(0).?.*);
+    try testing.expectEqual(@as(usize, 100), deque.front().?.*);
     try testing.expectEqual(@as(usize, 101), deque.get(1).?.*);
+    try testing.expectEqual(@as(usize, 101), deque.back().?.*);
 
     // more items
     {
