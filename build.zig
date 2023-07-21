@@ -5,12 +5,18 @@ pub fn build(b: *std.build.Builder) void {
 
     const optimize = b.standardOptimizeOption(.{});
 
+    _ = b.addModule("zig-deque", .{
+        .source_file = .{ .path = "src/deque.zig" },
+        .dependencies = &.{},
+    });
+
     const lib = b.addStaticLibrary(.{
         .name = "zig-deque",
         .root_source_file = .{ .path = "src/deque.zig" },
         .target = target,
         .optimize = optimize,
     });
+
     b.installArtifact(lib);
 
     const main_tests = b.addTest(.{
