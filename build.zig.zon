@@ -2,4 +2,5 @@
     .name = "zig-deque",
     .version = "0.1.0",
     .dependencies = .{},
+    .paths = .{""},
 }

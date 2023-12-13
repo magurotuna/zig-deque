@@ -259,7 +259,7 @@ pub fn Deque(comptime T: type) type {
         fn copyNonOverlapping(self: *Self, dest: usize, src: usize, length: usize) void {
             assert(dest + length <= self.cap());
             assert(src + length <= self.cap());
-            mem.copy(T, self.buf[dest .. dest + length], self.buf[src .. src + length]);
+            @memcpy(self.buf[dest .. dest + length], self.buf[src .. src + length]);
         }
 
         fn wrapAdd(self: Self, idx: usize, addend: usize) usize {
