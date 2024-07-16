@@ -160,6 +160,24 @@ pub fn Deque(comptime T: type) type {
             };
         }
 
+        pub fn format(self: *const Self, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
+            try writer.writeAll("Deque(");
+            try std.fmt.format(writer, "{}", .{T});
+            try writer.writeAll(") { .items = [");
+
+            var it = self.iterator();
+            if (it.next()) |val| try writer.print("{any}", .{val});
+            while (it.next()) |val| try writer.print(", {any}", .{val});
+
+            try writer.writeAll("], .head = ");
+            try std.fmt.format(writer, "{}", .{self.head});
+            try writer.writeAll(", .tail = ");
+            try std.fmt.format(writer, "{}", .{self.tail});
+            try writer.writeAll(", .len = ");
+            try std.fmt.format(writer, "{}", .{self.len()});
+            try writer.writeAll(" }");
+        }
+
         pub const Iterator = struct {
             head: usize,
             tail: usize,
@@ -371,6 +389,18 @@ test "appendSlice and prependSlice" {
             try testing.expectEqual(i, deque.get(i).?.*);
         }
     }
+}
+
+test "format" {
+    const testing = std.testing;
+
+    var deque = try Deque(usize).init(testing.allocator);
+    defer deque.deinit();
+
+    try deque.pushBack(69);
+    try deque.pushBack(420);
+
+    std.debug.print("{}\n", .{deque});
 }
 
 test "nextBack" {
