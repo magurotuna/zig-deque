@@ -163,7 +163,7 @@ pub fn Deque(comptime T: type) type {
         pub fn format(self: *const Self, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
             try writer.writeAll("Deque(");
             try std.fmt.format(writer, "{}", .{T});
-            try writer.writeAll(") { .items = [");
+            try writer.writeAll(") { .buf = [");
 
             var it = self.iterator();
             if (it.next()) |val| try writer.print("{any}", .{val});
