@@ -6,13 +6,13 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{});
 
     _ = b.addModule("zig-deque", .{
-        .root_source_file = .{ .path = "src/deque.zig" },
+        .root_source_file = b.path("src/deque.zig"),
         .imports = &.{},
     });
 
     const lib = b.addStaticLibrary(.{
         .name = "zig-deque",
-        .root_source_file = .{ .path = "src/deque.zig" },
+        .root_source_file = b.path("src/deque.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -20,7 +20,7 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(lib);
 
     const main_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/deque.zig" },
+        .root_source_file = b.path("src/deque.zig"),
         .target = target,
         .optimize = optimize,
     });

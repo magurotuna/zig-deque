@@ -33,7 +33,3 @@ std.debug.assert(sum == 3);
 std.debug.assert(deque.popFront().? == @as(usize, 0));
 std.debug.assert(deque.popBack().? == @as(usize, 2));
 ```
-
-## Version
-
-Tested under both v0.9.1 and v0.10.0-dev.3659+e5e6eb983
