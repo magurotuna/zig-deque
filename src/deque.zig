@@ -41,7 +41,7 @@ pub fn Deque(comptime T: type) type {
         pub fn initCapacity(allocator: Allocator, capacity: usize) Allocator.Error!Self {
             const effective_cap =
                 math.ceilPowerOfTwo(usize, @max(capacity +| 1, MINIMUM_CAPACITY + 1)) catch
-                math.ceilPowerOfTwoAssert(usize, INITIAL_CAPACITY + 1);
+                    math.ceilPowerOfTwoAssert(usize, INITIAL_CAPACITY + 1);
             const buf = try allocator.alloc(T, effective_cap);
             return Self{
                 .tail = 0,
